@@ -1,6 +1,20 @@
+"use client";
+
 import Link from "next/link";
+import { Field, Form, Formik } from "formik";
+import * as Yup from "yup";
+import { useRouter } from "next/navigation";
+import { Toast } from "@/lib/alert";
+
+const validationSchema = Yup.object({
+  username: Yup.string().max(25, "Must be 15 or less").required("Required"),
+  password: Yup.string().min(8, "Must be 8 or more").required("Required"),
+  email: Yup.string().email("Invalid email").required("Required"),
+});
 
 export default function Register() {
+  const router = useRouter();
+
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 lg:px-8">
@@ -11,81 +25,137 @@ export default function Register() {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6">
-            <div>
-              <label
-                htmlFor="username"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Email address
-              </label>
-              <div className="mt-2">
-                <input
-                  id="username"
-                  name="username"
-                  type="username"
-                  autoComplete="username"
-                  required
-                  className="focus:outline-red-blood block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
+          <Formik
+            initialValues={{ username: "", email: "", password: "" }}
+            validationSchema={validationSchema}
+            onSubmit={(values, actions) => {
+              setTimeout(async () => {
+                const res = await fetch("/api/auth/register", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(values),
+                });
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Email address
-              </label>
-              <div className="mt-2">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className="focus:outline-red-blood block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
+                if (!res.ok) {
+                  Toast.fire<any>({
+                    icon: "error",
+                    title: "Signed in failed",
+                  });
+                  actions.setSubmitting(false);
+                  return;
+                }
 
-            <div>
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium leading-6 text-gray-900"
+                Toast.fire<any>({
+                  icon: "success",
+                  title: "Signed in successfully",
+                });
+                router.push("/login");
+                actions.setSubmitting(false);
+                actions.resetForm();
+                return;
+              }, 1000);
+            }}
+          >
+            {(props) => (
+              <Form className="space-y-6" onSubmit={props.handleSubmit}>
+                <div>
+                  <label
+                    htmlFor="username"
+                    className="flex items-center justify-between text-sm font-medium leading-6 text-gray-900"
+                  >
+                    <span>Username</span>
+                    {props.touched.username && props.errors.username && (
+                      <span className="text-red-blood">
+                        {props.errors.username}
+                      </span>
+                    )}
+                  </label>
+                  <div className="mt-2">
+                    <Field
+                      id="username"
+                      name="username"
+                      type="username"
+                      onChange={props.handleChange}
+                      value={props.values.username}
+                      disabled={props.isSubmitting}
+                      required
+                      className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:outline-red-blood focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="flex items-center justify-between text-sm font-medium leading-6 text-gray-900"
+                  >
+                    <span>Email address</span>
+                    {props.touched.email && props.errors.email && (
+                      <span className="text-red-blood">
+                        {props.errors.email}
+                      </span>
+                    )}
+                  </label>
+                  <div className="mt-2">
+                    <Field
+                      id="email"
+                      name="email"
+                      type="email"
+                      onChange={props.handleChange}
+                      value={props.values.email}
+                      disabled={props.isSubmitting}
+                      required
+                      className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:outline-red-blood focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between">
+                    <label
+                      htmlFor="password"
+                      className="flex w-full items-center justify-between text-sm font-medium leading-6 text-gray-900"
+                    >
+                      <span>Password</span>
+                      {props.touched.password && props.errors.password && (
+                        <span className="text-red-blood">
+                          {props.errors.password}
+                        </span>
+                      )}
+                    </label>
+                  </div>
+                  <div className="mt-2">
+                    <Field
+                      id="password"
+                      name="password"
+                      type="password"
+                      onChange={props.handleChange}
+                      value={props.values.password}
+                      disabled={props.isSubmitting}
+                      required
+                      className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:outline-red-blood focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={props.isSubmitting}
+                  className="flex w-full justify-center rounded-md bg-red-blood px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-blood/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-blood disabled:cursor-not-allowed disabled:bg-red-blood/50"
                 >
-                  Password
-                </label>
-              </div>
-              <div className="mt-2">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  className="focus:outline-red-blood block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                className="bg-red-blood focus-visible:outline-red-blood hover:bg-red-blood/90 flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-              >
-                Sign up
-              </button>
-            </div>
-          </form>
+                  {props.isSubmitting ? "Loading..." : "Sign up"}
+                </button>
+              </Form>
+            )}
+          </Formik>
 
           <p className="mt-10 text-center text-sm text-gray-500">
             Already have an account?{" "}
             <Link
               href="/login"
-              className="text-red-blood hover:text-red-blood/90 font-semibold leading-6"
+              className="font-semibold leading-6 text-red-blood hover:text-red-blood/90"
             >
               Sign in here
             </Link>

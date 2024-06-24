@@ -1,4 +1,4 @@
-import GetContents from "@/lib/mongodb/service";
+import { GetContents } from "@/lib/mongodb/service";
 import { NextResponse } from "next/server";
 
 export async function GET() {
