@@ -41,7 +41,7 @@ export default function Register() {
                 if (!res.ok) {
                   Toast.fire<any>({
                     icon: "error",
-                    title: "Signed in failed",
+                    title: "Signed up failed",
                   });
                   actions.setSubmitting(false);
                   return;
@@ -49,7 +49,7 @@ export default function Register() {
 
                 Toast.fire<any>({
                   icon: "success",
-                  title: "Signed in successfully",
+                  title: "Signed up successfully",
                 });
                 router.push("/login");
                 actions.setSubmitting(false);

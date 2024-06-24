@@ -63,3 +63,23 @@ export async function Register(data: {
     };
   }
 }
+
+export async function Login(data: { email: string; password: string }) {
+  const client = clientPromise;
+  const db = client.db("web");
+  const { email, password } = data;
+
+  // Check if the user already exists
+  const existingUser = await db.collection("users").findOne({ email });
+
+  if (!existingUser) {
+    return null;
+  }
+
+  const isMatch = await bcrypt.compare(password, existingUser.password);
+  if (!isMatch) {
+    return null;
+  }
+
+  return existingUser;
+}
