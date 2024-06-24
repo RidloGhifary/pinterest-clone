@@ -21,7 +21,7 @@ export default function RootLayout({
       <body className={poppins.className}>
         <SessionProvider>
           <Navbar />
-          {children}
+          <main className="max-width">{children}</main>
         </SessionProvider>
       </body>
     </html>

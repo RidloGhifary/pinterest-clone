@@ -5,10 +5,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import MobileNavbar from "./MobileNavbar";
+import { useSession } from "next-auth/react";
 
 export default function Navbar() {
-  const isAuthenticated = true;
+  const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
   const pathname = usePathname();
+
+  if (status === "loading") {
+    <p>...</p>;
+  }
 
   return (
     <div className="max-width w-full py-3">
@@ -87,7 +93,7 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/profile/ridlo">
+              <Link href="/ridlo">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-light-gray">
                   R
                 </div>
