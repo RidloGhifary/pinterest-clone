@@ -1,3 +1,6 @@
+"use client";
+
+import { signOut } from "next-auth/react";
 import Image from "next/image";
 
 export default function UserCard() {
@@ -24,6 +27,12 @@ export default function UserCard() {
         </button>
         <button className="rounded-full bg-light-gray px-6 py-3 hover:bg-light-gray/80">
           Edit
+        </button>
+        <button
+          onClick={() => signOut()}
+          className="rounded-full bg-red-blood px-6 py-3 text-light-gray hover:bg-red-blood/80"
+        >
+          Logout
         </button>
       </div>
     </div>
