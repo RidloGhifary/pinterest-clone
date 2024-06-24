@@ -19,6 +19,7 @@ export default function Navbar() {
               src="/logo.png"
               width={70}
               height={70}
+              priority
               alt="logo"
               className="aspect-auto h-6 w-6 rounded-full"
             />
