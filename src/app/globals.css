@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .max-width {
+    @apply max-w-7xl container p-3;
+  }
+}
