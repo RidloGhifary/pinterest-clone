@@ -13,6 +13,7 @@ const config: Config = {
     extend: {
       colors: {
         "light-gray": "#f1f1f1",
+        "red-blood": "#e70d24",
       },
     },
   },
