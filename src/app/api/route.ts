@@ -1,4 +1,3 @@
-import clientPromise from "@/lib/mongodb/connect";
 import GetContents from "@/lib/mongodb/service";
 import { NextResponse } from "next/server";
 
