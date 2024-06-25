@@ -165,3 +165,34 @@ export async function VerifyOtp(data: { otpCode: string; userEmail: string }) {
     };
   }
 }
+
+export async function LoginWithGoogle(data: any, callback: any) {
+  const client = clientPromise;
+  const db = client.db("web");
+
+  const user = await db.collection("users").findOne({ email: data.email });
+
+  if (user) {
+    await db
+      .collection("users")
+      .updateOne(
+        { email: data.email, username: data.name },
+        { $set: { type: data.type, updatedAt: new Date() } },
+      );
+
+    return callback({ status: true, user });
+  }
+
+  await db.collection("users").insertOne({
+    username: data.name,
+    email: data.email,
+    profile_picture: data.image,
+    type: data.type,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    verified: true,
+    otpCode: null,
+  });
+
+  return callback({ status: true, user });
+}

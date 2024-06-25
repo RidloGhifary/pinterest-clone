@@ -6,14 +6,17 @@ import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 import { Toast } from "@/lib/alert";
 import { signIn } from "next-auth/react";
+import Image from "next/image";
 
 const validationSchema = Yup.object({
   password: Yup.string().min(8, "Must be 8 or more").required("Required"),
   email: Yup.string().email("Invalid email").required("Required"),
 });
 
-export default function Login() {
+export default function Login({ searchParams }: { searchParams: any }) {
   const router = useRouter();
+
+  const callbackUrl = searchParams.callbackUrl || "/";
 
   return (
     <>
@@ -34,7 +37,7 @@ export default function Login() {
                   redirect: false,
                   email: values.email,
                   password: values.password,
-                  callbackUrl: "/",
+                  callbackUrl,
                 });
 
                 if (!res?.ok) {
@@ -118,6 +121,26 @@ export default function Login() {
                   className="flex w-full justify-center rounded-md bg-red-blood px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-blood/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-blood disabled:cursor-not-allowed disabled:bg-red-blood/50"
                 >
                   {props.isSubmitting ? "Loading..." : "Sign in"}
+                </button>
+
+                <hr />
+
+                <button
+                  type="button"
+                  disabled={props.isSubmitting}
+                  onClick={() =>
+                    signIn("google", { callbackUrl, redirect: false })
+                  }
+                  className="flex w-full items-center justify-center gap-1 rounded-md border border-light-gray bg-white px-3 py-1.5 text-sm font-semibold leading-6 text-red-blood hover:bg-black/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:bg-white/50"
+                >
+                  <Image
+                    src="/google.png"
+                    width={20}
+                    height={20}
+                    alt="google"
+                    className="mr-2"
+                  />
+                  {props.isSubmitting ? "Loading..." : "Login with google"}
                 </button>
               </Form>
             )}

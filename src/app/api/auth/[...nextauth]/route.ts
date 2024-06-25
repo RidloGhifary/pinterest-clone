@@ -1,7 +1,8 @@
-import { Login } from "@/lib/mongodb/service";
+import { Login, LoginWithGoogle } from "@/lib/mongodb/service";
 import { NextAuthOptions } from "next-auth";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 
 const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
@@ -24,6 +25,10 @@ const authOptions: NextAuthOptions = {
         return user;
       },
     }),
+    GoogleProvider({
+      clientId: (process.env.GOOGLE_CLIENT_ID as string) || "",
+      clientSecret: (process.env.GOOGLE_CLIENT_SECRET as string) || "",
+    }),
   ],
   callbacks: {
     async jwt({ token, user, account }: any) {
@@ -31,6 +36,26 @@ const authOptions: NextAuthOptions = {
         token.email = user?.email;
         token.username = user?.username;
         token.role = user?.role;
+      }
+
+      if (account?.provider === "google") {
+        const data = {
+          name: user.name,
+          email: user.email,
+          image: user.image,
+          type: "google",
+        };
+
+        await LoginWithGoogle(
+          data,
+          (result: { status: boolean; user: any }) => {
+            if (result.status) {
+              token.email = result.user.email;
+              token.name = result.user.name;
+              token.role = result.user.role;
+            }
+          },
+        );
       }
 
       return token;
