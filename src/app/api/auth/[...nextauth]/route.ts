@@ -22,7 +22,8 @@ const authOptions: NextAuthOptions = {
         };
 
         const user: any = await Login({ email, password });
-        return user;
+        if (user) return user;
+        else return null;
       },
     }),
     GoogleProvider({
@@ -32,15 +33,15 @@ const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user, account }: any) {
-      if (account?.provider === "credentials") {
+      // console.log("🚀 ~ jwt ~ user:", user);
+      if (user && account?.provider === "credentials") {
         token.email = user?.email;
         token.username = user?.username;
-        token.role = user?.role;
       }
 
       if (account?.provider === "google") {
         const data = {
-          name: user.name,
+          username: user.username,
           email: user.email,
           image: user.image,
           type: "google",
@@ -51,8 +52,7 @@ const authOptions: NextAuthOptions = {
           (result: { status: boolean; user: any }) => {
             if (result.status) {
               token.email = result.user.email;
-              token.name = result.user.name;
-              token.role = result.user.role;
+              token.username = result.user.username;
             }
           },
         );
@@ -68,10 +68,6 @@ const authOptions: NextAuthOptions = {
 
       if ("username" in session.user) {
         session.user.username = token.username;
-      }
-
-      if ("role" in session.user) {
-        session.user.role = token.role;
       }
 
       return session;

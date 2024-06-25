@@ -6,9 +6,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import MobileNavbar from "./MobileNavbar";
 import { useSession } from "next-auth/react";
+import UserIMage from "../UserImage";
 
 export default function Navbar() {
-  const { status } = useSession();
+  const { status, data } = useSession();
   const isAuthenticated = status === "authenticated";
   const pathname = usePathname();
 
@@ -93,10 +94,8 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/ridlo">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-light-gray">
-                  R
-                </div>
+              <Link href={`/profile/${data?.user?.name}`}>
+                <UserIMage photoSize="h-10 w-10" imageSize="h-10 w-10" />
               </Link>
             </>
           )}

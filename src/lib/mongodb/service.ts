@@ -99,18 +99,11 @@ export async function Login(data: { email: string; password: string }) {
   // TODO Check if the user already exists
   const existingUser = await db.collection("users").findOne({ email });
 
-  if (!existingUser) {
-    return null;
-  }
-
-  if (!existingUser.verified) {
-    return null;
-  }
+  if (!existingUser || !existingUser.verified) return null;
 
   const isMatch = await bcrypt.compare(password, existingUser.password);
-  if (!isMatch) {
-    return null;
-  }
+
+  if (!isMatch) return null;
 
   return existingUser;
 }
@@ -176,7 +169,7 @@ export async function LoginWithGoogle(data: any, callback: any) {
     await db
       .collection("users")
       .updateOne(
-        { email: data.email, username: data.name },
+        { email: data.email, username: data.username },
         { $set: { type: data.type, updatedAt: new Date() } },
       );
 
@@ -184,7 +177,7 @@ export async function LoginWithGoogle(data: any, callback: any) {
   }
 
   await db.collection("users").insertOne({
-    username: data.name,
+    username: data.username,
     email: data.email,
     profile_picture: data.image,
     type: data.type,

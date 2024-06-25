@@ -20,6 +20,7 @@
     "nodemailer": "^6.9.14",
     "react": "^18",
     "react-dom": "^18",
+    "react-share": "^5.1.0",
     "sweetalert2": "^11.12.0",
     "yup": "^1.4.0"
   },

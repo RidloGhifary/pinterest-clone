@@ -1,10 +1,10 @@
-import UserCard from "./_components/UserCard";
+import User from "./_components/User";
 
 export default function Profile() {
   return (
-    <div className="space-y-5 py-8">
-      <UserCard />
-      <h1>Profile</h1>
+    <div className="space-y-5 py-8 text-center">
+      <h1>Hi welcome</h1>
+      <User />
     </div>
   );
 }
