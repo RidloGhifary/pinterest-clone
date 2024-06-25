@@ -81,9 +81,9 @@ export default function Navbar() {
                 Login
               </Link>
               <Link
-                href="/signup"
+                href="/register"
                 className={`${
-                  pathname === "/signup"
+                  pathname === "/register"
                     ? "rounded-full bg-black px-5 py-2 text-white"
                     : null
                 }`}

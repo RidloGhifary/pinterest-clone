@@ -51,7 +51,7 @@ export default function Register() {
                   icon: "success",
                   title: "Signed up successfully",
                 });
-                router.push("/login");
+                router.push("/verify");
                 actions.setSubmitting(false);
                 actions.resetForm();
                 return;
