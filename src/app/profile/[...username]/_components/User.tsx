@@ -3,21 +3,30 @@
 import UserIMage from "@/components/UserImage";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import Share from "./Share";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function UserCard() {
   const { status, data } = useSession();
 
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(name, value);
+
+      return params.toString();
+    },
+    [searchParams],
+  );
+
   if (status === "loading") {
     <p>...</p>;
   }
-
-  const GetUsernameFromEmail = useMemo(() => {
-    return (email: string): string => {
-      return email?.split("@")[0];
-    };
-  }, []);
 
   return (
     <div className="mx-auto grid w-full place-items-center space-y-4">
@@ -32,13 +41,16 @@ export default function UserCard() {
           priority
           className="opacity-70 grayscale"
         />
-        <p className="text-gray-500">
-          {GetUsernameFromEmail(data?.user?.email as string)}
-        </p>
+        <p className="text-gray-500">{data?.user?.email?.split("@")[0]}</p>
       </div>
       <div className="flex items-center gap-5">
         <Share />
-        <button className="rounded-full bg-light-gray px-6 py-3 hover:bg-light-gray/80">
+        <button
+          onClick={() =>
+            router.push(pathname + "?" + createQueryString("edit", "true"))
+          }
+          className="rounded-full bg-light-gray px-6 py-3 hover:bg-light-gray/80"
+        >
           Edit
         </button>
         <button
