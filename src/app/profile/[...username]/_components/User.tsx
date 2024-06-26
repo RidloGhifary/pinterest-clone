@@ -3,7 +3,7 @@
 import UserIMage from "@/components/UserImage";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import Share from "./Share";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -25,7 +25,7 @@ export default function UserCard() {
   );
 
   if (status === "loading") {
-    <p>...</p>;
+    return <p>...</p>;
   }
 
   return (

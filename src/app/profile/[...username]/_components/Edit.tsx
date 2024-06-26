@@ -1,15 +1,113 @@
 "use client";
 
+import { Toast } from "@/lib/alert";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import EditForm from "./EditForm";
+import { useState } from "react";
+import Image from "next/image";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
+import app from "@/lib/firebase/init";
 
 export default function Edit() {
   const { status, data } = useSession();
-  const router = useRouter();
+  const [previewImage, setPreviewImage] = useState<any>(null);
+  const [urlImage, setUrlImage] = useState<any>(null);
+  const [isUploadLoading, setIsUploadLoading] = useState<boolean>(false);
 
   if (status === "loading") {
-    <p>...</p>;
+    return <p>...</p>;
   }
+
+  const handleUploadImage = (e: any) => {
+    e.preventDefault();
+    setIsUploadLoading(true);
+
+    const file = e.target.files[0];
+
+    if (file.size > 2 * 1024 * 1024) {
+      Toast.fire({
+        icon: "error",
+        title: "File size should not exceed 2 MB",
+      });
+      setIsUploadLoading(false);
+      return;
+    }
+    setPreviewImage(URL.createObjectURL(file));
+    setUrlImage(file);
+    setIsUploadLoading(false);
+  };
+
+  const storage = getStorage(app, "gs://pinterestclone-7ec03.appspot.com");
+  function uploadFileStorage(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const metadata = {
+        contentType: file.type || "application/octet-stream", // Use file type if available
+      };
+
+      const storageRef = ref(storage, `${Date.now()}_${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file, metadata);
+
+      uploadTask.on(
+        "state_changed",
+        (_) => {
+          // Track upload progress here if needed
+        },
+        (error) => {
+          console.log("🚀 ~ returnnewPromise ~ error:", error);
+          reject(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            resolve(downloadURL);
+          });
+        },
+      );
+    });
+  }
+
+  const handleSubmitForm = async (values: any) => {
+    let profilePictureUrl = data?.user?.image;
+    if (urlImage) {
+      try {
+        profilePictureUrl = await uploadFileStorage(urlImage);
+      } catch (error) {
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "Upload failed",
+        });
+        return;
+      }
+    }
+
+    const datas = { email: data?.user?.email, profilePictureUrl, ...values };
+
+    const res = await fetch("/api/user", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(datas),
+    });
+
+    if (!res.ok) {
+      Toast.fire<any>({
+        icon: "error",
+        title: "Update failed",
+      });
+      return;
+    }
+
+    Toast.fire<any>({
+      icon: "success",
+      title: "Update successfully",
+    });
+  };
 
   return (
     <div className="flex min-h-full flex-1 flex-col px-6 lg:px-8">
@@ -22,91 +120,49 @@ export default function Edit() {
         </p>
         <div className="mt-10 space-y-8">
           <div className="flex items-center gap-6">
-            <div
-              className={`flex h-20 w-20 items-center justify-center rounded-full bg-light-gray text-4xl`}
-            >
-              X
+            {previewImage ? (
+              <Image
+                src={previewImage}
+                alt="preview-image"
+                loading="lazy"
+                width={300}
+                height={300}
+                className="h-20 w-20 rounded-full"
+              />
+            ) : data?.user?.image ? (
+              <Image
+                src={data?.user?.image}
+                alt="preview-image"
+                loading="lazy"
+                width={300}
+                height={300}
+                className="h-20 w-20 rounded-full"
+              />
+            ) : (
+              <div
+                className={`flex h-20 w-20 items-center justify-center rounded-full bg-light-gray text-4xl`}
+              >
+                X
+              </div>
+            )}
+
+            <div>
+              <label
+                htmlFor="file"
+                className="cursor-pointer rounded-full bg-light-gray px-6 py-3 transition hover:bg-light-gray/70"
+              >
+                Change
+              </label>
+              <input
+                type="file"
+                id="file"
+                className="hidden"
+                onChange={(e: any) => handleUploadImage(e)}
+              />
             </div>
-            <button className="rounded-full bg-light-gray px-6 py-3 transition hover:bg-light-gray/70">
-              Change
-            </button>
+            {isUploadLoading && <span>Loading...</span>}
           </div>
-          <form className="space-y-4">
-            <div>
-              <label
-                htmlFor="username"
-                className="flex items-center justify-between text-sm font-medium leading-6 text-gray-900"
-              >
-                <span>Username</span>
-                {/* {props.touched.email && props.errors.email && (
-                <span className="text-red-blood">{props.errors.email}</span>
-              )} */}
-              </label>
-              <div className="mt-2">
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  required
-                  placeholder="Give your username"
-                  className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-light-gray placeholder:text-gray-600 focus:outline-light-gray focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-            <div>
-              <label
-                htmlFor="bio"
-                className="flex items-center justify-between text-sm font-medium leading-6 text-gray-900"
-              >
-                <span>Bio</span>
-                {/* {props.touched.email && props.errors.email && (
-                <span className="text-red-blood">{props.errors.email}</span>
-              )} */}
-              </label>
-              <div className="mt-2">
-                <textarea
-                  id="bio"
-                  name="bio"
-                  required
-                  rows={5}
-                  placeholder="Write a few sentences about yourself"
-                  className="block w-full resize-none rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-light-gray placeholder:text-gray-600 focus:outline-light-gray focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-            <div>
-              <label
-                htmlFor="link"
-                className="flex items-center justify-between text-sm font-medium leading-6 text-gray-900"
-              >
-                <span>Profile link</span>
-                {/* {props.touched.email && props.errors.email && (
-                <span className="text-red-blood">{props.errors.email}</span>
-              )} */}
-              </label>
-              <div className="mt-2">
-                <input
-                  id="link"
-                  name="link"
-                  type="text"
-                  required
-                  placeholder="https://example.com"
-                  className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-light-gray placeholder:text-gray-600 focus:outline-light-gray focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-            <div className="mt-1 flex items-center justify-end gap-6">
-              <button className="rounded-full bg-light-gray px-6 py-3 transition hover:bg-light-gray/70">
-                Save
-              </button>
-              <button
-                className="rounded-full bg-light-gray px-6 py-3 transition hover:bg-light-gray/70"
-                onClick={() => router.back()}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
+          <EditForm user={data?.user} handleSubmitForm={handleSubmitForm} />
         </div>
       </div>
     </div>

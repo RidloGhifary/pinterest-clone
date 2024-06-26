@@ -13,9 +13,9 @@ export default function Navbar() {
   const isAuthenticated = status === "authenticated";
   const pathname = usePathname();
 
-  if (status === "loading") {
-    <p>...</p>;
-  }
+  // if (status === "loading") {
+  //   return <p>...</p>;
+  // }
 
   return (
     <div className="max-width w-full py-3">
@@ -69,7 +69,9 @@ export default function Navbar() {
         </div>
 
         <div className="flex flex-1 items-center justify-end gap-5">
-          {!isAuthenticated ? (
+          {status === "loading" ? (
+            <p>...</p>
+          ) : !isAuthenticated ? (
             <>
               <Link
                 href="/login"
