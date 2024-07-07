@@ -4,7 +4,11 @@ import Link from "next/link";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
-import { Toast } from "@/lib/alert";
+import { useState } from "react";
+
+import { register } from "@/actions/register";
+import { FormError } from "@/components/form-error";
+import { FormSuccess } from "@/components/form-success";
 
 const validationSchema = Yup.object({
   username: Yup.string().max(25, "Must be 15 or less").required("Required"),
@@ -13,13 +17,16 @@ const validationSchema = Yup.object({
 });
 
 export default function Register() {
+  const [error, setError] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
+
   const router = useRouter();
 
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+          <h2 className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             Sign up to your account
           </h2>
         </div>
@@ -29,33 +36,20 @@ export default function Register() {
             initialValues={{ username: "", email: "", password: "" }}
             validationSchema={validationSchema}
             onSubmit={(values, actions) => {
-              setTimeout(async () => {
-                const res = await fetch("/api/auth/register", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify(values),
-                });
+              setError("");
+              setSuccess("");
 
-                if (!res.ok) {
-                  Toast.fire<any>({
-                    icon: "error",
-                    title: "Signed up failed",
-                  });
+              register(values).then((data) => {
+                if (data.error) {
+                  setError(data.error);
                   actions.setSubmitting(false);
                   return;
                 }
 
-                Toast.fire<any>({
-                  icon: "success",
-                  title: "Signed up successfully",
-                });
-                router.push("/verify");
-                actions.setSubmitting(false);
+                setSuccess(data.success);
                 actions.resetForm();
-                return;
-              }, 1000);
+                actions.setSubmitting(false);
+              });
             }}
           >
             {(props) => (
@@ -139,6 +133,9 @@ export default function Register() {
                     />
                   </div>
                 </div>
+
+                <FormError message={error} />
+                <FormSuccess message={success} />
 
                 <button
                   type="submit"

@@ -6,22 +6,22 @@ export const metadata: Metadata = {
   description: "Generated for learning Next.js",
 };
 
-export async function GetPhotos() {
-  try {
-    const res = await fetch("https://picsum.photos/v2/list");
-    const data = await res.json();
-    return data;
-  } catch (e) {
-    console.error(e);
-  }
-}
+// export async function GetPhotos() {
+//   try {
+//     const res = await fetch("https://picsum.photos/v2/list");
+//     const data = await res.json();
+//     return data;
+//   } catch (e) {
+//     console.error(e);
+//   }
+// }
 
 export default async function Home() {
-  const datas = await GetPhotos();
+  // const datas = await GetPhotos();
 
   return (
     <div className="columns-5 gap-3">
-      {datas?.map((data: any) => (
+      {/* {datas?.map((data: any) => (
         <Image
           src={data?.download_url}
           alt={data?.author}
@@ -31,7 +31,7 @@ export default async function Home() {
           loading="lazy"
           className="mb-3 rounded-lg"
         />
-      ))}
+      ))} */}
     </div>
   );
 }

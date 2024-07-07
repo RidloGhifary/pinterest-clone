@@ -10,13 +10,13 @@ export default function Profile() {
 
   return (
     <div className="space-y-5 py-8 text-center">
-      {!search ? (
+      {/* {!search ? (
         <>
           <User />
         </>
       ) : (
         <Edit />
-      )}
+      )} */}
     </div>
   );
 }

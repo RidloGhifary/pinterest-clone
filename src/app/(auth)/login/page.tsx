@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { Field, Form, Formik } from "formik";
-import * as Yup from "yup";
 import { useRouter } from "next/navigation";
-import { Toast } from "@/lib/alert";
-import { signIn } from "next-auth/react";
-import Image from "next/image";
+import { useState } from "react";
+import * as Yup from "yup";
+
+import { login } from "@/actions/login";
+import { FormError } from "@/components/form-error";
+import { FormSuccess } from "@/components/form-success";
 
 const validationSchema = Yup.object({
   password: Yup.string().min(8, "Must be 8 or more").required("Required"),
@@ -14,6 +16,9 @@ const validationSchema = Yup.object({
 });
 
 export default function Login({ searchParams }: { searchParams: any }) {
+  const [error, setError] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
+
   const router = useRouter();
 
   const callbackUrl = searchParams.callbackUrl || "/";
@@ -22,7 +27,7 @@ export default function Login({ searchParams }: { searchParams: any }) {
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+          <h2 className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             Sign in to your account
           </h2>
         </div>
@@ -33,29 +38,25 @@ export default function Login({ searchParams }: { searchParams: any }) {
             validationSchema={validationSchema}
             onSubmit={(values, actions) => {
               setTimeout(async () => {
-                const res = await signIn("credentials", {
-                  redirect: false,
-                  email: values.email,
-                  password: values.password,
-                  callbackUrl,
-                });
+                login(values, callbackUrl)
+                  .then((data) => {
+                    if (data?.error) {
+                      setError(data?.error);
+                      actions.setSubmitting(false);
+                      return;
+                    }
 
-                if (!res?.ok) {
-                  Toast.fire<any>({
-                    icon: "error",
-                    title: "Signed in failed",
+                    if (data?.success) {
+                      actions.resetForm();
+                      setError(data?.success);
+                      actions.setSubmitting(false);
+                    }
+                  })
+                  .catch((err) => {
+                    console.log("🚀 ~ setTimeout ~ err:", err);
+                    actions.setSubmitting(false);
+                    setError("Something went wrong!");
                   });
-                  actions.setSubmitting(false);
-                  return;
-                }
-
-                Toast.fire<any>({
-                  icon: "success",
-                  title: "Signed in successfully",
-                });
-                router.push("/");
-                actions.setSubmitting(false);
-                actions.resetForm();
               }, 1000);
             }}
           >
@@ -115,6 +116,9 @@ export default function Login({ searchParams }: { searchParams: any }) {
                   </div>
                 </div>
 
+                <FormError message={error} />
+                <FormSuccess message={success} />
+
                 <button
                   type="submit"
                   disabled={props.isSubmitting}
@@ -125,7 +129,7 @@ export default function Login({ searchParams }: { searchParams: any }) {
 
                 <hr />
 
-                <button
+                {/* <button
                   type="button"
                   disabled={props.isSubmitting}
                   onClick={() =>
@@ -141,7 +145,7 @@ export default function Login({ searchParams }: { searchParams: any }) {
                     className="mr-2"
                   />
                   {props.isSubmitting ? "Loading..." : "Login with google"}
-                </button>
+                </button> */}
               </Form>
             )}
           </Formik>
