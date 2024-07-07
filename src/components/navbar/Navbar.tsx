@@ -1,21 +1,19 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { ExtendedUser } from "../../../next-auth";
 import MobileNavbar from "./MobileNavbar";
-import { useSession } from "next-auth/react";
 import UserIMage from "../UserImage";
 
 export default function Navbar() {
-  const { status, data } = useSession();
-  const isAuthenticated = status === "authenticated";
+  const user: ExtendedUser | any = useCurrentUser();
+  const isAuthenticated = user;
   const pathname = usePathname();
-
-  // if (status === "loading") {
-  //   return <p>...</p>;
-  // }
 
   return (
     <div className="max-width w-full py-3">
@@ -69,9 +67,7 @@ export default function Navbar() {
         </div>
 
         <div className="flex flex-1 items-center justify-end gap-5">
-          {status === "loading" ? (
-            <p>...</p>
-          ) : !isAuthenticated ? (
+          {!isAuthenticated ? (
             <>
               <Link
                 href="/login"
@@ -96,7 +92,7 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href={`/profile/${data?.user?.name}`}>
+              <Link href={`/profile/${user?.name}`}>
                 <UserIMage photoSize="h-10 w-10" imageSize="h-10 w-10" />
               </Link>
             </>

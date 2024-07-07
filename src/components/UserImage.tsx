@@ -1,7 +1,9 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { ExtendedUser } from "../../next-auth";
 import Image from "next/image";
+
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 export default function UserIMage({
   photoSize,
@@ -10,18 +12,14 @@ export default function UserIMage({
   photoSize: string;
   imageSize: string;
 }) {
-  const { data, status } = useSession();
-
-  if (status === "loading") {
-    <p>...</p>;
-  }
+  const user: ExtendedUser | any = useCurrentUser();
 
   return (
     <>
-      {data?.user?.image ? (
+      {user?.image ? (
         <Image
-          src={data?.user?.image}
-          alt={data?.user?.name as string}
+          src={user?.image}
+          alt={user?.name as string}
           priority
           width={500}
           height={500}
@@ -29,9 +27,9 @@ export default function UserIMage({
         />
       ) : (
         <div
-          className={`flex ${imageSize} items-center justify-center rounded-full bg-light-gray text-7xl`}
+          className={`flex ${imageSize} items-center justify-center rounded-full bg-light-gray text-xl`}
         >
-          {data?.user?.name?.charAt(0).toUpperCase()}
+          {user?.name?.charAt(0).toUpperCase()}
         </div>
       )}
     </>
