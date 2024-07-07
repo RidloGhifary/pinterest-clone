@@ -48,6 +48,7 @@ export default function Register() {
                 }
 
                 setSuccess(data.success);
+                router.push("/login");
                 actions.resetForm();
                 actions.setSubmitting(false);
               });
