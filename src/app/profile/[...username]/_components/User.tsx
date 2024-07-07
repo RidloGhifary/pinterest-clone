@@ -28,7 +28,7 @@ export default function UserCard() {
 
   return (
     <div className="mx-auto grid w-full place-items-center space-y-4">
-      <UserIMage photoSize="h-28 w-28" imageSize="h-36 w-36" />
+      <UserIMage photoSize="h-28 w-28" imageSize="h-36 w-36 text-6xl" />
       <h2 className="text-6xl font-semibold">{user?.name}</h2>
       <div className="flex items-center gap-1">
         <Image

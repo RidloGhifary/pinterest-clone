@@ -1,5 +1,3 @@
-"use client";
-
 import { ExtendedUser } from "../../next-auth";
 import Image from "next/image";
 
@@ -27,7 +25,7 @@ export default function UserIMage({
         />
       ) : (
         <div
-          className={`flex ${imageSize} items-center justify-center rounded-full bg-light-gray text-xl`}
+          className={`flex ${imageSize} items-center justify-center rounded-full bg-light-gray`}
         >
           {user?.name?.charAt(0).toUpperCase()}
         </div>
