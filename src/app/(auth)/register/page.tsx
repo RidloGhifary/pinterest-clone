@@ -9,6 +9,7 @@ import { useState } from "react";
 import { register } from "@/actions/register";
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
+import { Social } from "@/components/social";
 
 const validationSchema = Yup.object({
   username: Yup.string().max(25, "Must be 15 or less").required("Required"),
@@ -144,6 +145,10 @@ export default function Register() {
                 >
                   {props.isSubmitting ? "Loading..." : "Sign up"}
                 </button>
+
+                <hr />
+
+                <Social />
               </Form>
             )}
           </Formik>

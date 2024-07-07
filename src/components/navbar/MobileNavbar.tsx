@@ -1,8 +1,12 @@
+"use client";
+
+import { useCurrentUser } from "@/hooks/use-current-user";
 import { CirclePlus, Fingerprint, Home, Search, User } from "lucide-react";
 import Link from "next/link";
 
 export default function MobileNavbar() {
-  const isAuthenticated = true;
+  const user = useCurrentUser();
+  const isAuthenticated = user;
 
   return (
     <div className="absolute bottom-2 left-2 right-2 block rounded-full bg-light-gray p-5 sm:hidden">
@@ -18,7 +22,7 @@ export default function MobileNavbar() {
             <Link href="/create">
               <CirclePlus />
             </Link>
-            <Link href="/profile/:username">
+            <Link href={`/profile/${user?.id}`}>
               <User />
             </Link>
           </>

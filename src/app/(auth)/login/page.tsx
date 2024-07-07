@@ -9,6 +9,7 @@ import * as Yup from "yup";
 import { login } from "@/actions/login";
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
+import { Social } from "@/components/social";
 
 const validationSchema = Yup.object({
   password: Yup.string().min(8, "Must be 8 or more").required("Required"),
@@ -129,23 +130,7 @@ export default function Login({ searchParams }: { searchParams: any }) {
 
                 <hr />
 
-                {/* <button
-                  type="button"
-                  disabled={props.isSubmitting}
-                  onClick={() =>
-                    signIn("google", { callbackUrl, redirect: false })
-                  }
-                  className="flex w-full items-center justify-center gap-1 rounded-md border border-light-gray bg-white px-3 py-1.5 text-sm font-semibold leading-6 text-red-blood hover:bg-black/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:bg-white/50"
-                >
-                  <Image
-                    src="/google.png"
-                    width={20}
-                    height={20}
-                    alt="google"
-                    className="mr-2"
-                  />
-                  {props.isSubmitting ? "Loading..." : "Login with google"}
-                </button> */}
+                <Social />
               </Form>
             )}
           </Formik>

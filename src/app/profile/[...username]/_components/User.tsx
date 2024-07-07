@@ -1,14 +1,16 @@
 "use client";
 
-import UserIMage from "@/components/UserImage";
-import { signOut, useSession } from "next-auth/react";
-import Image from "next/image";
-import { useCallback } from "react";
-import Share from "./Share";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
+import Image from "next/image";
+
+import { useCurrentUser } from "@/hooks/use-current-user";
+import UserIMage from "@/components/UserImage";
+import { logOut } from "@/actions/logout";
+import Share from "./Share";
 
 export default function UserCard() {
-  const { status, data } = useSession();
+  const user = useCurrentUser();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -24,14 +26,10 @@ export default function UserCard() {
     [searchParams],
   );
 
-  if (status === "loading") {
-    return <p>...</p>;
-  }
-
   return (
     <div className="mx-auto grid w-full place-items-center space-y-4">
       <UserIMage photoSize="h-28 w-28" imageSize="h-36 w-36" />
-      <h2 className="text-6xl font-semibold">{data?.user?.name}</h2>
+      <h2 className="text-6xl font-semibold">{user?.name}</h2>
       <div className="flex items-center gap-1">
         <Image
           src="/logo.png"
@@ -41,7 +39,7 @@ export default function UserCard() {
           priority
           className="opacity-70 grayscale"
         />
-        <p className="text-gray-500">{data?.user?.email?.split("@")[0]}</p>
+        <p className="text-gray-500">{user?.email?.split("@")[0]}</p>
       </div>
       <div className="flex items-center gap-5">
         <Share />
@@ -54,7 +52,7 @@ export default function UserCard() {
           Edit
         </button>
         <button
-          onClick={() => signOut()}
+          onClick={() => logOut()}
           className="rounded-full bg-red-blood px-6 py-3 text-light-gray hover:bg-red-blood/80"
         >
           Logout

@@ -92,7 +92,7 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href={`/profile/${user?.name}`}>
+              <Link href={`/profile/${user?.id}`}>
                 <UserIMage photoSize="h-10 w-10" imageSize="h-10 w-10" />
               </Link>
             </>

@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import User from "./_components/User";
-import Edit from "./_components/Edit";
+// import Edit from "./_components/Edit";
 
 export default function Profile() {
   const searchParams = useSearchParams();
@@ -10,13 +10,14 @@ export default function Profile() {
 
   return (
     <div className="space-y-5 py-8 text-center">
-      {/* {!search ? (
+      {!search ? (
         <>
           <User />
         </>
       ) : (
-        <Edit />
-      )} */}
+        <p>Hello guys</p>
+        // <Edit />
+      )}
     </div>
   );
 }
